@@ -1,0 +1,48 @@
+import time
+
+def simulate_landing():
+    # Initial approach parameters
+    altitude = 1000.0        # feet
+    airspeed = 160.0         # knots
+    descent_rate = 12.0      # feet per second
+    gear_down = False
+    landed = False
+
+    print("Starting final approach...")
+
+    while not landed:
+        # Deploy landing gear below 500 feet
+        if altitude <= 500 and not gear_down:
+            gear_down = True
+            print("[SYSTEM] Landing gear deployed.")
+
+        # Flare maneuver near the runway to soften touchdown
+        if altitude <= 100:
+            descent_rate = max(3.0, descent_rate - 2.0)
+            airspeed = max(130.0, airspeed - 3.0)
+
+        # Update altitude
+        altitude = max(0.0, altitude - descent_rate)
+        print(f"Altitude: {altitude:6.1f} ft | Speed: {airspeed:5.1f} kts | Descent: {descent_rate:4.1f} ft/s")
+
+        # Evaluate touchdown conditions when wheels meet the ground
+        if altitude == 0.0:
+            if gear_down and descent_rate <= 6.0 and 120.0 <= airspeed <= 150.0:
+                print("\nTouchdown! Engaging reverse thrust and brakes...")
+                landed = True
+            else:
+                print("\n[CRASH] Unsafe touchdown (check gear, speed, or descent rate).")
+                return
+
+        time.sleep(0.2)
+
+    # Runway braking rollout
+    while airspeed > 0:
+        airspeed = max(0.0, airspeed - 25.0)
+        print(f"Rollout speed: {airspeed:5.1f} kts")
+        time.sleep(0.2)
+
+    print("Aircraft has come to a complete stop.")
+
+if __name__ == "__main__":
+    simulate_landing()
