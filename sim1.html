@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CITY LOOP // 01 — Monochrome Simulation</title>
+
+  <!-- Tailwind CSS for responsive Swiss grid layout and typography -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono for crisp architectural typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Strict Monochrome Palette Variables: ONLY #000000 and #f8f8f8 */
+    :root {
+      --bg-paper: #f8f8f8;
+      --ink-black: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-paper);
+      color: var(--ink-black);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* High-contrast Swiss architectural GO / PAUSE button */
+    .btn-monochrome {
+      background-color: var(--ink-black);
+      color: var(--bg-paper);
+      border: 2px solid var(--ink-black);
+      transition: background-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+                  color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 100ms ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .btn-monochrome:hover {
+      background-color: var(--bg-paper);
+      color: var(--ink-black);
+    }
+
+    .btn-monochrome:active {
+      transform: translateY(1px);
+    }
+
+    .btn-monochrome:focus-visible {
+      outline: 2px solid var(--ink-black);
+      outline-offset: 4px;
+    }
+
+    /* Subtle pulse animation for the live status indicator when IN MOTION */
+    @keyframes statusPulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.35;
+        transform: scale(0.82);
+      }
+    }
+
+    .status-dot-active {
+      animation: statusPulse 1.2s infinite ease-in-out;
+    }
+
+    /* Responsive canvas sizing inside its 2px framed container */
+    #cityCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-[#000000] selection:text-[#f8f8f8]">
+
+  <!-- Main Architectural Frame Wrapper -->
+  <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-6 sm:py-10 flex-1 flex flex-col justify-center">
+
+    <!-- Top Minimal Header Bar -->
+    <header class="w-full border-b-2 border-[#000000] pb-3.5 sm:pb-4 mb-5 sm:mb-7 flex flex-wrap items-center justify-between gap-3">
+      <!-- Left: Project Identifier -->
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-2.5 h-2.5 bg-[#000000]" aria-hidden="true"></span>
+        <h1 class="font-mono-tech text-sm sm:text-base md:text-lg font-bold tracking-[0.14em] uppercase text-[#000000]">
+          CITY LOOP // 01
+        </h1>
+      </div>
+
+      <!-- Right: Live Status Indicator & Loop Counter -->
+      <div class="flex items-center gap-4 sm:gap-6 font-mono-tech text-xs sm:text-sm font-semibold tracking-[0.12em] uppercase">
+        <!-- Live Motion Status -->
+        <div class="flex items-center gap-2 border border-[#000000] px-2.5 py-1 bg-[#f8f8f8]">
+          <span
+            id="statusDot"
+            class="inline-block w-2 h-2 border border-[#000000] bg-[#f8f8f8]"
+            aria-hidden="true"
+          ></span>
+          <span id="statusText">STANDBY</span>
+        </div>
+
+        <!-- Loop Counter -->
+        <div class="flex items-center gap-1.5 border border-[#000000] px-2.5 py-1 bg-[#000000] text-[#f8f8f8]">
+          <span>LOOP</span>
+          <span id="loopCounter" class="tabular-nums">000</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Centerpiece: Framed Responsive HTML5 Canvas Simulation -->
+    <main class="w-full">
+      <div
+        id="canvasFrame"
+        class="relative w-full h-[50vh] min-h-[330px] max-h-[540px] border-2 border-[#000000] bg-[#f8f8f8] overflow-hidden"
+      >
+        <canvas id="cityCanvas" aria-label="Monochrome city loop simulation with one black car and one white car"></canvas>
+      </div>
+
+      <!-- Controls Section Directly Below Canvas -->
+      <div class="mt-5 sm:mt-7 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <!-- Minimal Architectural Telemetry Strip (Left / Desktop) -->
+        <div class="hidden sm:flex items-center gap-6 font-mono-tech text-xs tracking-[0.12em] uppercase text-[#000000]">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 bg-[#000000] border border-[#000000]"></span>
+            <span>UNIT 01 // BLACK</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 bg-[#f8f8f8] border border-[#000000]"></span>
+            <span>UNIT 02 // WHITE</span>
+          </div>
+        </div>
+
+        <!-- Prominent High-Contrast GO / PAUSE Button -->
+        <div class="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3">
+          <button
+            id="toggleBtn"
+            type="button"
+            class="btn-monochrome w-full sm:w-56 md:w-64 py-3.5 sm:py-4 px-8 text-sm sm:text-base font-extrabold tracking-[0.22em] uppercase text-center"
+            aria-pressed="false"
+          >
+            GO
+          </button>
+        </div>
+
+        <!-- Keyboard Shortcut & Speed Readout (Right / Desktop) -->
+        <div class="hidden sm:flex items-center justify-end gap-4 font-mono-tech text-xs tracking-[0.12em] uppercase text-[#000000]">
+          <span>KEY // [SPACE]</span>
+          <span class="border-l border-[#000000] pl-4 tabular-nums" id="speedReadout">000 KM/H</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Subtle Minimal Footer Rule -->
+    <footer class="w-full border-t border-[#000000] mt-6 sm:mt-8 pt-3 flex items-center justify-between font-mono-tech text-[11px] tracking-[0.12em] uppercase text-[#000000]">
+      <span>MONOCHROME ARCHITECTURE // #000000 &amp; #F8F8F8</span>
+      <span class="tabular-nums" id="distanceReadout">DIST // 0.00 KM</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // STRICT PALETTE CONSTANTS (#000000 & #f8f8f8 ONLY)
+      // =========================================================================
+      const BLACK = '#000000';
+      const WHITE = '#f8f8f8';
+      const GRID_LINE_INK = 'rgba(0, 0, 0, 0.075)';
+      const HEADLIGHT_START = 'rgba(248, 248, 248, 0.42)';
+      const HEADLIGHT_END = 'rgba(248, 248, 248, 0.0)';
+
+      // =========================================================================
+      // DOM REFERENCES
+      // =========================================================================
+      const canvas = document.getElementById('cityCanvas');
+      const ctx = canvas.getContext('2d');
+      const canvasFrame = document.getElementById('canvasFrame');
+      const toggleBtn = document.getElementById('toggleBtn');
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      const loopCounterEl = document.getElementById('loopCounter');
+      const speedReadoutEl = document.getElementById('speedReadout');
+      const distanceReadoutEl = document.getElementById('distanceReadout');
+
+      // =========================================================================
+      // SIMULATION STATE
+      // =========================================================================
+      const state = {
+        isRunning: false,
+        speedFactor: 0,         // 0.0 (standby) -> 1.0 (full cruise)
+        baseCruiseSpeed: 460,   // Logical px/sec at full cruise
+        totalDistance: 0,       // Cumulative foreground distance
+        loopCycleLength: 1600,  // Logical px per city loop cycle
+        loopCount: 0,
+        lastTimestamp: 0,
+        width: 0,
+        height: 0,
+        dpr: 1,
+
+        // Individual vehicle dynamics (for organic overtaking & wheel rotation)
+        blackCar: {
+          phase: 0.25,
+          wheelAngle: 0,
+          prevOffsetX: 0,
+          pitch: 0,
+          bouncePhase: 0
+        },
+        whiteCar: {
+          phase: 2.35,
+          wheelAngle: 0,
+          prevOffsetX: 0,
+          pitch: 0,
+          bouncePhase: 1.7
+        }
+      };
+
+      // =========================================================================
+      // DETERMINISTIC ARCHITECTURAL CITY BLUEPRINTS (SEAMLESS 1600PX TILE)
+      // =========================================================================
+      // Layer 2: Far Skyline (White fill, 1.5px Black outline, sleek geometric towers)
+      const FAR_TILE_WIDTH = 1600;
+      const farSkylineBuildings = [
+        { x: 20,  w: 110, h: 215, style: 'spire',   step: 0.22 },
+        { x: 145, w: 95,  h: 165, style: 'flat',    step: 0 },
+        { x: 255, w: 135, h: 255, style: 'setback', step: 0.28 },
+        { x: 410, w: 85,  h: 150, style: 'slant',   step: 0 },
+        { x: 515, w: 125, h: 235, style: 'twin',    step: 0.18 },
+        { x: 660, w: 105, h: 185, style: 'flat',    step: 0 },
+        { x: 785, w: 145, h: 270, style: 'spire',   step: 0.30 },
+        { x: 950, w: 90,  h: 160, style: 'slant',   step: 0 },
+        { x: 1060,w: 130, h: 220, style: 'setback', step: 0.24 },
+        { x: 1210,w: 100, h: 175, style: 'flat',    step: 0 },
+        { x: 1330,w: 140, h: 245, style: 'crown',   step: 0.20 },
+        { x: 1490,w: 90,  h: 155, style: 'flat',    step: 0 }
+      ];
+
+      // Layer 3: Midground City (Alternating solid #000000 & #f8f8f8 architectural buildings)
+      const MID_TILE_WIDTH = 1600;
+      const midgroundBuildings = [
+        { x: 15,  w: 120, h: 155, invert: true,  pattern: 'grid' },
+        { x: 150, w: 105, h: 120, invert: false, pattern: 'vertical' },
+        { x: 272, w: 140, h: 185, invert: true,  pattern: 'slits' },
+        { x: 430, w: 115, h: 135, invert: false, pattern: 'brace' },
+        { x: 562, w: 130, h: 170, invert: true,  pattern: 'ribbon' },
+        { x: 710, w: 100, h: 115, invert: false, pattern: 'grid' },
+        { x: 828, w: 145, h: 195, invert: true,  pattern: 'grid' },
+        { x: 990, w: 115, h: 140, invert: false, pattern: 'vertical' },
+        { x: 1122,w: 135, h: 175, invert: true,  pattern: 'slits' },
+        { x: 1275,w: 110, h: 125, invert: false, pattern: 'brace' },
+        { x: 1402,w: 130, h: 165, invert: true,  pattern: 'ribbon' },
+        { x: 1546,w: 44,  h: 110, invert: false, pattern: 'vertical' }
+      ];
+
+      // =========================================================================
+      // RESPONSIVE CANVAS RESIZING
+      // =========================================================================
+      function resizeCanvas() {
+        try {
+          const rect = canvasFrame.getBoundingClientRect();
+          state.dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+          state.width = Math.max(280, Math.floor(rect.width));
+          state.height = Math.max(260, Math.floor(rect.height));
+
+          canvas.width = Math.floor(state.width * state.dpr);
+          canvas.height = Math.floor(state.height * state.dpr);
+
+          ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+          renderScene(0);
+        } catch (err) {
+          console.error('Canvas resize error:', err);
+        }
+      }
+
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => resizeCanvas());
+        ro.observe(canvasFrame);
+      }
+      window.addEventListener('resize', resizeCanvas);
+
+      // =========================================================================
+      // CONTROLS & INTERACTION (CLICK, TOUCH, SPACEBAR)
+      // =========================================================================
+      function toggleSimulation() {
+        state.isRunning = !state.isRunning;
+
+        if (state.isRunning) {
+          toggleBtn.textContent = 'PAUSE';
+          toggleBtn.setAttribute('aria-pressed', 'true');
+          statusText.textContent = 'IN MOTION';
+          statusDot.classList.remove('bg-[#f8f8f8]');
+          statusDot.classList.add('bg-[#000000]', 'status-dot-active');
+        } else {
+          toggleBtn.textContent = 'GO';
+          toggleBtn.setAttribute('aria-pressed', 'false');
+          statusText.textContent = 'STANDBY';
+          statusDot.classList.remove('bg-[#000000]', 'status-dot-active');
+          statusDot.classList.add('bg-[#f8f8f8]');
+        }
+      }
+
+      toggleBtn.addEventListener('click', toggleSimulation);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.key === ' ') {
+          // Avoid double-trigger if button itself is focused
+          if (document.activeElement === toggleBtn) return;
+          e.preventDefault();
+          toggleSimulation();
+        }
+      });
+
+      // =========================================================================
+      // LAYER 1: SKY (ARCHITECTURAL GRID + GEOMETRIC SUN/MOON)
+      // =========================================================================
+      function drawSkyLayer(w, horizonY, scrollOffset) {
+        // Base crisp #f8f8f8 sky
+        ctx.fillStyle = WHITE;
+        ctx.fillRect(0, 0, w, horizonY);
+
+        // Subtle minimalist architectural drafting grid
+        const gridStep = 48;
+        const offsetX = -(scrollOffset % gridStep);
+        ctx.strokeStyle = GRID_LINE_INK;
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        for (let x = offsetX; x < w; x += gridStep) {
+          ctx.moveTo(Math.round(x) + 0.5, 0);
+          ctx.lineTo(Math.round(x) + 0.5, horizonY);
+        }
+        for (let y = gridStep; y < horizonY; y += gridStep) {
+          ctx.moveTo(0, Math.round(y) + 0.5);
+          ctx.lineTo(w, Math.round(y) + 0.5);
+        }
+        ctx.stroke();
+
+        // Geometric circle sun/moon in #000000 outline (upper right quadrant)
+        const sunX = Math.min(w * 0.78, w - 70);
+        const sunY = Math.max(58, horizonY * 0.25);
+        const sunRadius = Math.max(20, Math.min(32, w * 0.032));
+
+        ctx.save();
+        ctx.strokeStyle = BLACK;
+        ctx.lineWidth = 1.75;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Subtle Swiss architectural crosshair ticks around the sun/moon
+        ctx.lineWidth = 1;
+        const tickInner = sunRadius + 6;
+        const tickOuter = sunRadius + 13;
+        ctx.beginPath();
+        ctx.moveTo(sunX - tickOuter, sunY);
+        ctx.lineTo(sunX - tickInner, sunY);
+        ctx.moveTo(sunX + tickInner, sunY);
+        ctx.lineTo(sunX + tickOuter, sunY);
+        ctx.moveTo(sunX, sunY - tickOuter);
+        ctx.lineTo(sunX, sunY - tickInner);
+        ctx.moveTo(sunX, sunY + tickInner);
+        ctx.lineTo(sunX, sunY + tickOuter);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // LAYER 2: FAR SKYLINE (SLOW PARALLAX, #f8f8f8 FILL + 1.5px #000000 OUTLINE)
+      // =========================================================================
+      function drawFarSkylineLayer(w, horizonY, scrollOffset, scaleY) {
+        const startTile = Math.floor(scrollOffset / FAR_TILE_WIDTH);
+        const endTile = Math.floor((scrollOffset + w) / FAR_TILE_WIDTH) + 1;
+
+        ctx.save();
+        ctx.fillStyle = WHITE;
+        ctx.strokeStyle = BLACK;
+        ctx.lineWidth = 1.5;
+
+        for (let tile = startTile; tile <= endTile; tile++) {
+          const tileBaseX = tile * FAR_TILE_WIDTH - scrollOffset;
+
+          for (let i = 0; i < farSkylineBuildings.length; i++) {
+            const b = farSkylineBuildings[i];
+            const bx = tileBaseX + b.x;
+            const bw = b.w;
+            const bh = b.h * scaleY;
+            const by = horizonY - bh;
+
+            if (bx + bw < -20 || bx > w + 20) continue;
+
+            ctx.beginPath();
+            if (b.style === 'setback') {
+              const inset = bw * 0.18;
+              const tierH = bh * b.step;
+              ctx.moveTo(bx, horizonY);
+              ctx.lineTo(bx, by + tierH);
+              ctx.lineTo(bx + inset, by + tierH);
+              ctx.lineTo(bx + inset, by);
+              ctx.lineTo(bx + bw - inset, by);
+              ctx.lineTo(bx + bw - inset, by + tierH);
+              ctx.lineTo(bx + bw, by + tierH);
+              ctx.lineTo(bx + bw, horizonY);
+            } else if (b.style === 'slant') {
+              const slantDrop = bh * 0.14;
+              ctx.moveTo(bx, horizonY);
+              ctx.lineTo(bx, by + slantDrop);
+              ctx.lineTo(bx + bw, by);
+              ctx.lineTo(bx + bw, horizonY);
+            } else if (b.style === 'crown') {
+              const crownW = bw * 0.45;
+              const crownH = 16 * scaleY;
+              ctx.rect(bx, by, bw, bh);
+              ctx.moveTo(bx + (bw - crownW) / 2, by);
+              ctx.lineTo(bx + (bw - crownW) / 2, by - crownH);
+              ctx.lineTo(bx + (bw + crownW) / 2, by - crownH);
+              ctx.lineTo(bx + (bw + crownW) / 2, by);
+            } else {
+              ctx.rect(bx, by, bw, bh);
+            }
+            ctx.fill();
+            ctx.stroke();
+
+            // Spire antenna or minimalist vertical structural lines
+            if (b.style === 'spire') {
+              const spireX = bx + bw * 0.5;
+              const spireTop = by - 26 * scaleY;
+              ctx.beginPath();
+              ctx.moveTo(spireX, by);
+              ctx.lineTo(spireX, spireTop);
+              ctx.stroke();
+            } else if (b.style === 'twin') {
+              ctx.beginPath();
+              ctx.moveTo(bx + bw * 0.5, by + 10);
+              ctx.lineTo(bx + bw * 0.5, horizonY);
+              ctx.stroke();
+            }
+
+            // Subtle architectural facade line on far towers
+            ctx.save();
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(bx + bw * 0.25, by + 14);
+            ctx.lineTo(bx + bw * 0.25, horizonY - 8);
+            ctx.moveTo(bx + bw * 0.75, by + 14);
+            ctx.lineTo(bx + bw * 0.75, horizonY - 8);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // LAYER 3: MIDGROUND CITY (MEDIUM PARALLAX, ALTERNATING #000000 & #f8f8f8)
+      // =========================================================================
+      function drawMidgroundCityLayer(w, horizonY, scrollOffset, scaleY) {
+        const startTile = Math.floor(scrollOffset / MID_TILE_WIDTH);
+        const endTile = Math.floor((scrollOffset + w) / MID_TILE_WIDTH) + 1;
+
+        ctx.save();
+
+        for (let tile = startTile; tile <= endTile; tile++) {
+          const tileBaseX = tile * MID_TILE_WIDTH - scrollOffset;
+
+          for (let i = 0; i < midgroundBuildings.length; i++) {
+            const b = midgroundBuildings[i];
+            const bx = tileBaseX + b.x;
+            const bw = b.w;
+            const bh = b.h * scaleY;
+            const by = horizonY - bh;
+
+            if (bx + bw < -20 || bx > w + 20) continue;
+
+            // Main building block
+            ctx.fillStyle = b.invert ? BLACK : WHITE;
+            ctx.strokeStyle = BLACK;
+            ctx.lineWidth = 1.75;
+
+            ctx.fillRect(bx, by, bw, bh);
+            ctx.strokeRect(bx, by, bw, bh);
+
+            // Geometric window & architectural facade detailing
+            const detailColor = b.invert ? WHITE : BLACK;
+            ctx.fillStyle = detailColor;
+            ctx.strokeStyle = detailColor;
+
+            const padX = 12;
+            const padTop = 14;
+            const innerW = bw - padX * 2;
+            const innerH = bh - padTop - 12;
+
+            if (innerW > 12 && innerH > 16) {
+              if (b.pattern === 'grid') {
+                const cols = Math.max(2, Math.floor(innerW / 20));
+                const rows = Math.max(3, Math.floor(innerH / 22));
+                const cellW = innerW / cols;
+                const cellH = innerH / rows;
+                const winW = Math.max(4, cellW * 0.45);
+                const winH = Math.max(5, cellH * 0.48);
+
+                for (let r = 0; r < rows; r++) {
+                  for (let c = 0; c < cols; c++) {
+                    const wx = bx + padX + c * cellW + (cellW - winW) / 2;
+                    const wy = by + padTop + r * cellH + (cellH - winH) / 2;
+                    ctx.fillRect(wx, wy, winW, winH);
+                  }
+                }
+              } else if (b.pattern === 'slits') {
+                const cols = Math.max(3, Math.floor(innerW / 16));
+                const step = innerW / cols;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let c = 0; c < cols; c++) {
+                  const sx = bx + padX + c * step + step * 0.5;
+                  ctx.moveTo(sx, by + padTop);
+                  ctx.lineTo(sx, by + padTop + innerH);
+                }
+                ctx.stroke();
+              } else if (b.pattern === 'ribbon') {
+                const rows = Math.max(3, Math.floor(innerH / 20));
+                const step = innerH / rows;
+                for (let r = 0; r < rows; r++) {
+                  const ry = by + padTop + r * step + step * 0.28;
+                  ctx.fillRect(bx + padX, ry, innerW, Math.max(3, step * 0.32));
+                }
+              } else if (b.pattern === 'vertical') {
+                ctx.lineWidth = 1.25;
+                const cols = Math.max(3, Math.floor(innerW / 18));
+                const step = innerW / cols;
+                ctx.beginPath();
+                for (let c = 1; c < cols; c++) {
+                  const vx = bx + padX + c * step;
+                  ctx.moveTo(vx, by + 6);
+                  ctx.lineTo(vx, horizonY - 6);
+                }
+                ctx.stroke();
+              } else if (b.pattern === 'brace') {
+                // Architectural cross-bracing bays
+                const bays = Math.max(2, Math.floor(innerH / 42));
+                const bayH = innerH / bays;
+                ctx.lineWidth = 1.25;
+                ctx.strokeRect(bx + padX, by + padTop, innerW, innerH);
+                ctx.beginPath();
+                for (let k = 0; k < bays; k++) {
+                  const topY = by + padTop + k * bayH;
+                  const botY = topY + bayH;
+                  ctx.moveTo(bx + padX, topY);
+                  ctx.lineTo(bx + padX + innerW, botY);
+                  ctx.moveTo(bx + padX + innerW, topY);
+                  ctx.lineTo(bx + padX, botY);
+                }
+                ctx.stroke();
+              }
+            }
+          }
+        }
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // LAYER 4: FOREGROUND STREET, LAMPS, BOLLARDS & TWO-LANE ROAD
+      // =========================================================================
+      function drawForegroundStreetLayer(w, h, layout, scrollOffset, speedFactor) {
+        const { sidewalkTopY, roadTopY, roadBottomY, roadCenterY } = layout;
+
+        // 1. Sidewalk deck (#f8f8f8)
+        ctx.fillStyle = WHITE;
+        ctx.fillRect(0, sidewalkTopY, w, roadTopY - sidewalkTopY);
+
+        // Top sidewalk architectural edge
+        ctx.strokeStyle = BLACK;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, sidewalkTopY);
+        ctx.lineTo(w, sidewalkTopY);
+        ctx.stroke();
+
+        // Sidewalk expansion joints & architectural bollards (fast parallax)
+        const bollardSpacing = 120;
+        const firstBollardX = -(scrollOffset % bollardSpacing);
+        ctx.fillStyle = BLACK;
+        ctx.strokeStyle = BLACK;
+        ctx.lineWidth = 1.25;
+
+        for (let bx = firstBollardX; bx < w + bollardSpacing; bx += bollardSpacing) {
+          // Sidewalk paving seam
+          ctx.beginPath();
+          ctx.moveTo(bx, sidewalkTopY);
+          ctx.lineTo(bx, roadTopY);
+          ctx.stroke();
+
+          // Minimalist architectural bollard near curb
+          const bollardH = 11;
+          const bollardW = 4;
+          ctx.fillRect(bx - bollardW / 2, roadTopY - bollardH - 2, bollardW, bollardH);
+        }
+
+        // Minimalist cantilevered streetlamps (every 360px)
+        const lampSpacing = 360;
+        const firstLampX = -(scrollOffset % lampSpacing);
+        const lampHeight = Math.max(54, Math.min(74, h * 0.16));
+
+        ctx.strokeStyle = BLACK;
+        ctx.fillStyle = BLACK;
+        ctx.lineWidth = 2.5;
+
+        for (let lx = firstLampX; lx < w + lampSpacing; lx += lampSpacing) {
+          const baseY = roadTopY - 2;
+          const topY = baseY - lampHeight;
+          const armLen = 22;
+
+          // Vertical pole + clean 90-degree cantilevered arm
+          ctx.beginPath();
+          ctx.moveTo(lx, baseY);
+          ctx.lineTo(lx, topY);
+          ctx.lineTo(lx + armLen, topY);
+          ctx.stroke();
+
+          // Base plinth
+          ctx.fillRect(lx - 4, baseY - 4, 8, 4);
+
+          // Sleek luminaire head
+          ctx.fillRect(lx + armLen - 8, topY - 1, 12, 4);
+        }
+
+        // 2. Solid #000000 Two-Lane Highway
+        ctx.fillStyle = BLACK;
+        ctx.fillRect(0, roadTopY, w, roadBottomY - roadTopY);
+
+        // Crisp #f8f8f8 upper and lower shoulder edge stripes inside the road
+        ctx.strokeStyle = WHITE;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, roadTopY + 5);
+        ctx.lineTo(w, roadTopY + 5);
+        ctx.moveTo(0, roadBottomY - 5);
+        ctx.lineTo(w, roadBottomY - 5);
+        ctx.stroke();
+
+        // #f8f8f8 Dashed Center Lane Divider
+        const dashLen = 36;
+        const gapLen = 30;
+        const period = dashLen + gapLen;
+        const dashStart = -(scrollOffset % period);
+
+        ctx.fillStyle = WHITE;
+        for (let dx = dashStart; dx < w + period; dx += period) {
+          ctx.fillRect(dx, roadCenterY - 1.5, dashLen, 3);
+        }
+
+        // Subtle #f8f8f8 horizontal motion streaks on asphalt when moving
+        if (speedFactor > 0.04) {
+          const streakSpacing = 240;
+          const streakLen = 18 + speedFactor * 42;
+          ctx.save();
+          ctx.globalAlpha = 0.25 * speedFactor;
+          ctx.fillStyle = WHITE;
+
+          for (let i = 0; i < 4; i++) {
+            const laneOffset = i % 2 === 0 ? -16 : 16;
+            const sy = roadCenterY + laneOffset;
+            const phaseShift = i * 95;
+            const sx = w - (((scrollOffset * 1.15 + phaseShift) % (w + streakSpacing)));
+            ctx.fillRect(sx, sy, streakLen, 1);
+          }
+          ctx.restore();
+        }
+
+        // 3. Bottom Architectural Margin Strip (#f8f8f8 below road)
+        if (roadBottomY < h) {
+          ctx.fillStyle = WHITE;
+          ctx.fillRect(0, roadBottomY, w, h - roadBottomY);
+          ctx.strokeStyle = BLACK;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, roadBottomY);
+          ctx.lineTo(w, roadBottomY);
+          ctx.stroke();
+        }
+      }
+
+      // =========================================================================
+      // SLEEK MONOCHROME CARS (BLACK CAR & WHITE CAR)
+      // =========================================================================
+      function drawSleekCar(options) {
+        const {
+          x,
+          y,
+          scale,
+          isBlackCar,
+          wheelAngle,
+          pitch,
+          bounceY,
+          speedFactor
+        } = options;
+
+        const bodyFill = isBlackCar ? BLACK : WHITE;
+        const bodyStroke = isBlackCar ? WHITE : BLACK;
+        const windowFill = isBlackCar ? WHITE : BLACK;
+        const pillarFill = isBlackCar ? BLACK : WHITE;
+
+        ctx.save();
+        ctx.translate(x, y + bounceY);
+        ctx.scale(scale, scale);
+
+        // Car dimensions in local architectural space (facing right ->)
+        const carLen = 128;
+        const carHeight = 34;
+        const wheelRadius = 11.5;
+        const rearWheelX = -38;
+        const frontWheelX = 38;
+        const wheelCenterY = 0;
+
+        // 1. Soft #f8f8f8 Headlight Cone projecting forward onto the #000000 road
+        const beamLen = 105 + speedFactor * 45;
+        const beamSpread = 22;
+        const noseX = carLen / 2 - 2;
+        const noseY = -11;
+
+        ctx.save();
+        const grad = ctx.createLinearGradient(noseX, noseY, noseX + beamLen, noseY + 4);
+        grad.addColorStop(0, HEADLIGHT_START);
+        grad.addColorStop(1, HEADLIGHT_END);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(noseX, noseY - 2);
+        ctx.lineTo(noseX + beamLen, noseY - beamSpread * 0.55);
+        ctx.lineTo(noseX + beamLen, noseY + beamSpread);
+        ctx.lineTo(noseX, noseY + 3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // 2. Chassis Group (applies subtle pitch tilt during acceleration/overtaking)
+        ctx.save();
+        ctx.rotate(pitch);
+
+        // Sleek Modernist Fastback / Coupe Silhouette
+        ctx.fillStyle = bodyFill;
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+
+        ctx.beginPath();
+        // Rear lower diffuser corner
+        ctx.moveTo(-carLen / 2 + 2, -3);
+        // Rear vertical Kammback tail
+        ctx.lineTo(-carLen / 2, -17);
+        // Fastback roofline sweeping forward
+        ctx.bezierCurveTo(-carLen / 2 + 16, -carHeight, -8, -carHeight - 2, 12, -carHeight + 2);
+        // Raked windshield
+        ctx.lineTo(32, -18);
+        // Sleek aerodynamic hood
+        ctx.bezierCurveTo(48, -17, carLen / 2 - 2, -15, carLen / 2, -9);
+        // Front splitter lip
+        ctx.lineTo(carLen / 2 - 2, -2);
+        // Front wheel arch cutout
+        ctx.lineTo(frontWheelX + wheelRadius + 3.5, -2);
+        ctx.arc(frontWheelX, wheelCenterY, wheelRadius + 3.5, 0, Math.PI, true);
+        // Side skirt
+        ctx.lineTo(rearWheelX + wheelRadius + 3.5, -2);
+        // Rear wheel arch cutout
+        ctx.arc(rearWheelX, wheelCenterY, wheelRadius + 3.5, 0, Math.PI, true);
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        // Geometric Cabin Windows
+        ctx.fillStyle = windowFill;
+        ctx.beginPath();
+        ctx.moveTo(-36, -19);
+        ctx.bezierCurveTo(-24, -29, -8, -30, 9, -28);
+        ctx.lineTo(26, -19);
+        ctx.closePath();
+        ctx.fill();
+
+        // Crisp B-pillar divider inside cabin window
+        ctx.fillStyle = pillarFill;
+        ctx.beginPath();
+        ctx.moveTo(-6, -29.5);
+        ctx.lineTo(-2.5, -29.5);
+        ctx.lineTo(-4.5, -19);
+        ctx.lineTo(-8, -19);
+        ctx.closePath();
+        ctx.fill();
+
+        // Architectural Shoulder Line
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 1.25;
+        ctx.beginPath();
+        ctx.moveTo(-54, -14);
+        ctx.lineTo(48, -13);
+        ctx.stroke();
+
+        // Headlight & Taillight Crisp Accents
+        ctx.fillStyle = WHITE;
+        // Front LED blade
+        ctx.fillRect(carLen / 2 - 7, -12, 6, 2.5);
+        // Rear vertical tail bar
+        ctx.fillRect(-carLen / 2 + 1, -16, 2.5, 8);
+
+        ctx.restore(); // End chassis pitch group
+
+        // 3. Spinning Spoked Wheels
+        drawWheel(rearWheelX, wheelCenterY, wheelRadius, wheelAngle, isBlackCar);
+        drawWheel(frontWheelX, wheelCenterY, wheelRadius, wheelAngle, isBlackCar);
+
+        // 4. Aerodynamic Roof Slipstream Line at Speed
+        if (speedFactor > 0.25) {
+          ctx.save();
+          ctx.globalAlpha = 0.55 * speedFactor;
+          ctx.strokeStyle = WHITE;
+          ctx.lineWidth = 1.25;
+          ctx.beginPath();
+          ctx.moveTo(-48, -carHeight - 5);
+          ctx.quadraticCurveTo(-8, -carHeight - 8, 22, -carHeight - 1);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      function drawWheel(wx, wy, radius, angle, isBlackCar) {
+        ctx.save();
+        ctx.translate(wx, wy);
+
+        // Tire (#000000) with crisp #f8f8f8 outer sidewall ring so it pops against the road
+        ctx.fillStyle = BLACK;
+        ctx.strokeStyle = WHITE;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Inner Rim Dish
+        const rimRadius = radius * 0.62;
+        ctx.fillStyle = isBlackCar ? BLACK : WHITE;
+        ctx.strokeStyle = isBlackCar ? WHITE : BLACK;
+        ctx.lineWidth = 1.25;
+        ctx.beginPath();
+        ctx.arc(0, 0, rimRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Rotating Spokes
+        ctx.rotate(angle);
+        const spokeCount = isBlackCar ? 5 : 6;
+        ctx.strokeStyle = isBlackCar ? WHITE : BLACK;
+        ctx.lineWidth = 1.35;
+        ctx.beginPath();
+        for (let i = 0; i < spokeCount; i++) {
+          const theta = (i * Math.PI * 2) / spokeCount;
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(theta) * (rimRadius - 0.5), Math.sin(theta) * (rimRadius - 0.5));
+        }
+        ctx.stroke();
+
+        // Center Hub Cap
+        ctx.fillStyle = isBlackCar ? WHITE : BLACK;
+        ctx.beginPath();
+        ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // MAIN RENDER & PHYSICS LOOP
+      // =========================================================================
+      function updateSimulation(dt) {
+        // Smooth acceleration & deceleration damping
+        const targetSpeedFactor = state.isRunning ? 1.0 : 0.0;
+        const smoothing = state.isRunning ? 2.6 : 3.8;
+        state.speedFactor += (targetSpeedFactor - state.speedFactor) * (1 - Math.exp(-dt * smoothing));
+
+        if (state.speedFactor < 0.0005 && !state.isRunning) {
+          state.speedFactor = 0;
+        }
+
+        const currentRoadSpeed = state.baseCruiseSpeed * state.speedFactor;
+        const deltaDist = currentRoadSpeed * dt;
+        state.totalDistance += deltaDist;
+
+        // Loop counter updates cleanly every 1600px city cycle
+        const completedLoops = Math.floor(state.totalDistance / state.loopCycleLength);
+        if (completedLoops !== state.loopCount) {
+          state.loopCount = completedLoops;
+          loopCounterEl.textContent = String(state.loopCount).padStart(3, '0');
+        }
+
+        // Update telemetry readouts
+        const simulatedKmh = Math.round(state.speedFactor * 118);
+        speedReadoutEl.textContent = `${String(simulatedKmh).padStart(3, '0')} KM/H`;
+        const kmDist = (state.totalDistance / 1600) * 0.42;
+        distanceReadoutEl.textContent = `DIST // ${kmDist.toFixed(2)} KM`;
+
+        // Update individual car pace-trading & wheel rotation
+        const maxSurge = Math.min(state.width * 0.21, 175);
+
+        // Black car harmonic surge
+        state.blackCar.phase += dt * (0.95 * state.speedFactor);
+        const blackOffsetX =
+          (Math.sin(state.blackCar.phase) * 0.68 + Math.sin(state.blackCar.phase * 0.45 + 0.8) * 0.32) *
+          maxSurge *
+          state.speedFactor;
+        const blackRelVel = dt > 0 ? (blackOffsetX - state.blackCar.prevOffsetX) / dt : 0;
+        state.blackCar.prevOffsetX = blackOffsetX;
+
+        const blackInstantSpeed = Math.max(0, currentRoadSpeed + blackRelVel);
+        state.blackCar.wheelAngle += (blackInstantSpeed * dt) / 11.5;
+        state.blackCar.bouncePhase += dt * (16 * state.speedFactor);
+        state.blackCar.pitch = -blackRelVel * 0.00014;
+
+        // White car harmonic surge (counter-phased for dynamic overtaking)
+        state.whiteCar.phase += dt * (1.08 * state.speedFactor);
+        const whiteOffsetX =
+          (Math.sin(state.whiteCar.phase) * 0.65 + Math.cos(state.whiteCar.phase * 0.52) * 0.35) *
+          maxSurge *
+          state.speedFactor;
+        const whiteRelVel = dt > 0 ? (whiteOffsetX - state.whiteCar.prevOffsetX) / dt : 0;
+        state.whiteCar.prevOffsetX = whiteOffsetX;
+
+        const whiteInstantSpeed = Math.max(0, currentRoadSpeed + whiteRelVel);
+        state.whiteCar.wheelAngle += (whiteInstantSpeed * dt) / 11.5;
+        state.whiteCar.bouncePhase += dt * (17.5 * state.speedFactor);
+        state.whiteCar.pitch = -whiteRelVel * 0.00014;
+      }
+
+      function renderScene() {
+        const w = state.width;
+        const h = state.height;
+        if (w <= 0 || h <= 0) return;
+
+        // Responsive vertical architectural proportions
+        const bottomMargin = Math.max(10, Math.round(h * 0.025));
+        const roadHeight = Math.max(84, Math.min(112, Math.round(h * 0.24)));
+        const sidewalkHeight = Math.max(18, Math.min(24, Math.round(h * 0.05)));
+
+        const roadBottomY = h - bottomMargin;
+        const roadTopY = roadBottomY - roadHeight;
+        const roadCenterY = roadTopY + roadHeight * 0.5;
+        const sidewalkTopY = roadTopY - sidewalkHeight;
+        const skylineScaleY = Math.max(0.65, Math.min(1.15, sidewalkTopY / 335));
+
+        // 1. Sky Layer (slowest parallax)
+        drawSkyLayer(w, sidewalkTopY, state.totalDistance * 0.04);
+
+        // 2. Far Skyline Layer (slow parallax)
+        drawFarSkylineLayer(w, sidewalkTopY, state.totalDistance * 0.18, skylineScaleY);
+
+        // 3. Midground City Layer (medium parallax)
+        drawMidgroundCityLayer(w, sidewalkTopY, state.totalDistance * 0.45, skylineScaleY);
+
+        // 4. Foreground Street & Two-Lane Highway (fast parallax)
+        drawForegroundStreetLayer(
+          w,
+          h,
+          { sidewalkTopY, roadTopY, roadBottomY, roadCenterY },
+          state.totalDistance * 1.0,
+          state.speedFactor
+        );
+
+        // 5. Render the Two Cars (Far Lane = Black Car, Near Lane = White Car)
+        const responsiveCarScale = Math.max(0.76, Math.min(1.06, w / 920));
+        const baseAnchorX = w * 0.45;
+
+        // Far (Upper) Lane: Sleek Black Car
+        const upperLaneGroundY = roadTopY + roadHeight * 0.38;
+        const blackBounce =
+          state.speedFactor > 0.01 ? Math.sin(state.blackCar.bouncePhase) * 0.85 * state.speedFactor : 0;
+
+        drawSleekCar({
+          x: baseAnchorX + state.blackCar.prevOffsetX - 18 * responsiveCarScale,
+          y: upperLaneGroundY,
+          scale: responsiveCarScale * 0.94,
+          isBlackCar: true,
+          wheelAngle: state.blackCar.wheelAngle,
+          pitch: state.blackCar.pitch,
+          bounceY: blackBounce,
+          speedFactor: state.speedFactor
+        });
+
+        // Near (Lower) Lane: Sleek White Car
+        const lowerLaneGroundY = roadTopY + roadHeight * 0.78;
+        const whiteBounce =
+          state.speedFactor > 0.01 ? Math.sin(state.whiteCar.bouncePhase) * 0.95 * state.speedFactor : 0;
+
+        drawSleekCar({
+          x: baseAnchorX + state.whiteCar.prevOffsetX + 22 * responsiveCarScale,
+          y: lowerLaneGroundY,
+          scale: responsiveCarScale * 1.02,
+          isBlackCar: false,
+          wheelAngle: state.whiteCar.wheelAngle,
+          pitch: state.whiteCar.pitch,
+          bounceY: whiteBounce,
+          speedFactor: state.speedFactor
+        });
+      }
+
+      function animate(timestamp) {
+        if (!state.lastTimestamp) state.lastTimestamp = timestamp;
+        const dt = Math.min((timestamp - state.lastTimestamp) / 1000, 0.05);
+        state.lastTimestamp = timestamp;
+
+        updateSimulation(dt);
+        renderScene();
+
+        requestAnimationFrame(animate);
+      }
+
+      // Start on window load
+      window.addEventListener('load', () => {
+        resizeCanvas();
+        requestAnimationFrame(animate);
+      });
+    })();
+  </script>
+</body>
+</html>
