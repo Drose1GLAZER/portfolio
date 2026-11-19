@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANTHROPOCENE // ELA Survival Studio</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Clean Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            void: '#000000',
+            paper: '#f8f8f8',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Strict Monochrome #000000 and #f8f8f8 Design System */
+    :root {
+      --bg: #000000;
+      --fg: #f8f8f8;
+      --border: rgba(248, 248, 248, 0.18);
+      --border-strong: rgba(248, 248, 248, 0.45);
+      --surface: rgba(248, 248, 248, 0.04);
+      --surface-hover: rgba(248, 248, 248, 0.09);
+    }
+
+    body.light-mode {
+      --bg: #f8f8f8;
+      --fg: #000000;
+      --border: rgba(0, 0, 0, 0.15);
+      --border-strong: rgba(0, 0, 0, 0.45);
+      --surface: rgba(0, 0, 0, 0.03);
+      --surface-hover: rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    .mono-border {
+      border: 1px solid var(--border);
+    }
+
+    .mono-border-strong {
+      border: 1px solid var(--border-strong);
+    }
+
+    .mono-surface {
+      background-color: var(--surface);
+    }
+
+    .mono-card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .mono-card:hover {
+      border-color: var(--border-strong);
+      background-color: var(--surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-inverted {
+      background-color: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--fg);
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn-inverted:hover {
+      opacity: 0.88;
+    }
+
+    .btn-inverted:active {
+      transform: scale(0.98);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border-strong);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      background-color: var(--fg);
+      color: var(--bg);
+    }
+
+    /* Custom Minimal Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 9999px;
+    }
+
+    /* Typing indicator dots */
+    @keyframes pulseDot {
+      0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+      40% { opacity: 1; transform: scale(1.1); }
+    }
+    .dot-1 { animation: pulseDot 1.2s infinite ease-in-out 0s; }
+    .dot-2 { animation: pulseDot 1.2s infinite ease-in-out 0.2s; }
+    .dot-3 { animation: pulseDot 1.2s infinite ease-in-out 0.4s; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#f8f8f8] selection:text-[#000000]">
+
+  <!-- Toast Notification (Replaces alert) -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-3 transition-all duration-300">
+    <div class="btn-inverted px-4 py-3 rounded-xl font-mono text-xs tracking-wide shadow-2xl flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      <span id="toast-msg">Copied to clipboard</span>
+    </div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-md" style="background-color: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl btn-inverted flex items-center justify-center font-mono font-bold text-sm">
+          5★
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold tracking-tight text-base sm:text-lg">ANTHROPOCENE // STUDIO</h1>
+            <span class="hidden sm:inline-block font-mono text-[10px] px-2 py-0.5 rounded-full mono-border opacity-75">ELA CHEAT-CODE</span>
+          </div>
+          <p class="text-xs opacity-65">John Green • Non-Fiction Essay Collection</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs & Theme Toggle -->
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+        <nav class="flex items-center gap-1 p-1 rounded-xl mono-border mono-surface overflow-x-auto max-w-full" aria-label="Primary Navigation">
+          <button onclick="switchTab('plot')" id="tab-plot" class="nav-btn btn-inverted px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap cursor-pointer">
+            01. Plot & Essays
+          </button>
+          <button onclick="switchTab('themes')" id="tab-themes" class="nav-btn px-3 py-2 rounded-lg text-xs font-medium opacity-75 hover:opacity-100 whitespace-nowrap cursor-pointer">
+            02. Themes
+          </button>
+          <button onclick="switchTab('cast')" id="tab-cast" class="nav-btn px-3 py-2 rounded-lg text-xs font-medium opacity-75 hover:opacity-100 whitespace-nowrap cursor-pointer">
+            03. Cast & Subjects
+          </button>
+          <button onclick="switchTab('chat')" id="tab-chat" class="nav-btn px-3 py-2 rounded-lg text-xs font-medium opacity-75 hover:opacity-100 whitespace-nowrap cursor-pointer flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+            04. Live Chat
+          </button>
+        </nav>
+
+        <!-- Invert Contrast Button (#000000 <-> #f8f8f8) -->
+        <button onclick="toggleTheme()" title="Invert Black & White Palette" class="p-2.5 rounded-xl mono-border hover:opacity-80 transition cursor-pointer shrink-0" aria-label="Toggle Black and White Mode">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- =========================================================
+         TAB 1: PLOT, STRUCTURE & KEY ESSAYS
+    ========================================================== -->
+    <section id="view-plot" class="space-y-8">
+      <!-- Hero Briefing Box -->
+      <div class="rounded-2xl mono-border mono-surface p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-8 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full mono-border font-mono text-xs">
+            <span>TL;DR // NO READING REQUIRED</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+            Wait—there’s no traditional “plot.” Here’s how the book actually works.
+          </h2>
+          <p class="text-sm sm:text-base opacity-80 leading-relaxed">
+            <em>The Anthropocene Reviewed</em> isn't a novel with chapters that follow one story. It is a collection of <strong>44 personal essays</strong> where author John Green reviews random parts of our human-centered planet (called the <strong>Anthropocene</strong>) on a 5-star scale—from Halley’s Comet to Diet Dr Pepper.
+          </p>
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="switchTab('chat')" class="btn-inverted px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer">
+              Ask John Green Anything →
+            </button>
+            <button onclick="copyText('In The Anthropocene Reviewed, John Green uses the 5-star review format to blend cultural history with personal memoir, transforming everyday objects into meditations on hope, fragility, and human connection.')" class="btn-outline px-4 py-3 rounded-xl text-xs sm:text-sm font-medium cursor-pointer">
+              Copy Intro Sentence for Essay
+            </button>
+          </div>
+        </div>
+
+        <!-- The 3-Step Essay Formula Card -->
+        <div class="lg:col-span-4 rounded-2xl mono-border p-5 space-y-4" style="background-color: var(--bg);">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs uppercase tracking-wider opacity-70">John's Secret Formula</span>
+            <span class="font-mono text-xs">3 ACTS / ESSAY</span>
+          </div>
+          <div class="space-y-3 text-xs sm:text-sm">
+            <div class="p-3 rounded-xl mono-surface mono-border">
+              <div class="font-mono font-bold mb-1">01 // WEIRD HISTORY</div>
+              <p class="opacity-75">Starts with fascinating facts about a random topic (e.g., how Monopoly was stolen).</p>
+            </div>
+            <div class="p-3 rounded-xl mono-surface mono-border">
+              <div class="font-mono font-bold mb-1">02 // PERSONAL PIVOT</div>
+              <p class="opacity-75">Connects that topic to his own life—his OCD, anxiety, family, or loneliness.</p>
+            </div>
+            <div class="p-3 rounded-xl mono-surface mono-border">
+              <div class="font-mono font-bold mb-1">03 // 5-STAR VERDICT</div>
+              <p class="opacity-75">Concludes with a deeper truth about being human and assigns a rating out of 5 stars.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Essay Decoder -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h3 class="text-xl sm:text-2xl font-bold tracking-tight">Most Assigned Essays (Decoded)</h3>
+            <p class="text-xs sm:text-sm opacity-70">Filter by star rating or search any topic your teacher brings up in class.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              id="essay-search"
+              oninput="renderEssays()"
+              placeholder="Search essays (e.g., Geese, Comet)..."
+              class="px-3.5 py-2.5 rounded-xl mono-border bg-transparent text-xs sm:text-sm focus:outline-none focus:border-current w-full sm:w-64"
+            />
+            <select id="essay-filter" onchange="renderEssays()" class="px-3.5 py-2.5 rounded-xl mono-border text-xs sm:text-sm focus:outline-none cursor-pointer" style="background-color: var(--bg); color: var(--fg);">
+              <option value="all">All Ratings</option>
+              <option value="high">4★ – 5★ (Hope & Awe)</option>
+              <option value="mid">2.5★ – 3.5★ (Complicated)</option>
+              <option value="low">1★ – 2★ (Pain & Chaos)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Essays Grid -->
+        <div id="essays-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TAB 2: CORE THEMES & ESSAY GENERATOR
+    ========================================================== -->
+    <section id="view-themes" class="hidden space-y-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="font-mono text-xs opacity-70 uppercase tracking-widest">ELA Exam & Essay Fuel</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">The 5 Big Themes Teachers Love</h2>
+        </div>
+        <p class="text-xs sm:text-sm opacity-75 max-w-md">
+          Click <strong>"Copy Thesis"</strong> on any theme below to grab a ready-to-use argument for class discussions or writing prompts.
+        </p>
+      </div>
+
+      <!-- Themes Cards -->
+      <div id="themes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Populated dynamically by JS -->
+      </div>
+
+      <!-- Interactive Mini-Tool: Rate Like John Green -->
+      <div class="rounded-2xl mono-border mono-surface p-6 sm:p-8 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="font-mono text-xs px-2.5 py-1 rounded-full mono-border">INTERACTIVE PRACTICE</span>
+            <h3 class="text-xl font-bold mt-2">Write an Anthropocene Review in 10 Seconds</h3>
+            <p class="text-xs sm:text-sm opacity-75">Teachers often ask you to write your own review essay. Pick any everyday object and see how John Green would frame it.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <input id="custom-topic" type="text" placeholder="Type anything (e.g., AirPods, School Cafeteria Pizza, Late Night Texts)..." class="sm:col-span-7 px-4 py-3 rounded-xl mono-border bg-transparent text-sm focus:outline-none" />
+          <select id="custom-stars" class="sm:col-span-2 px-3 py-3 rounded-xl mono-border text-sm cursor-pointer" style="background-color: var(--bg); color: var(--fg);">
+            <option value="5">★★★★★ (5.0)</option>
+            <option value="4.5">★★★★½ (4.5)</option>
+            <option value="3.5">★★★½ (3.5)</option>
+            <option value="2">★★☆☆☆ (2.0)</option>
+            <option value="1">★☆☆☆☆ (1.0)</option>
+          </select>
+          <button onclick="generateMiniReview()" id="mini-review-btn" class="sm:col-span-3 btn-inverted px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer">
+            Generate Draft
+          </button>
+        </div>
+
+        <div id="mini-review-output" class="hidden rounded-xl mono-border p-5 space-y-3" style="background-color: var(--bg);">
+          <div class="flex items-center justify-between">
+            <span id="mini-review-title" class="font-mono text-xs font-bold uppercase"></span>
+            <button onclick="copyText(document.getElementById('mini-review-text').innerText)" class="text-xs font-mono underline cursor-pointer">Copy Draft</button>
+          </div>
+          <p id="mini-review-text" class="text-sm leading-relaxed opacity-90"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TAB 3: CHARACTERS & KEY SUBJECTS
+    ========================================================== -->
+    <section id="view-cast" class="hidden space-y-6">
+      <div>
+        <span class="font-mono text-xs opacity-70 uppercase tracking-widest">Who's Actually In This Book?</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">Main Characters & Iconic Subjects</h2>
+        <p class="text-xs sm:text-sm opacity-75 mt-1 max-w-2xl">
+          Because this is non-fiction, the "characters" are John Green himself, historical figures he spotlights, and recurring symbols from nature and pop culture. Click <strong>"Chat Now"</strong> on anyone to interview them.
+        </p>
+      </div>
+
+      <div id="cast-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TAB 4: LIVE CHARACTER CHAT (POWERED BY GEMINI)
+    ========================================================== -->
+    <section id="view-chat" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[72vh]">
+        <!-- Left Sidebar: Persona Selector -->
+        <div class="lg:col-span-4 rounded-2xl mono-border mono-surface p-4 flex flex-col justify-between gap-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+              <span class="font-mono text-xs uppercase tracking-wider opacity-70">Select Persona</span>
+              <span class="font-mono text-[11px] opacity-60">5 AVAILABLE</span>
+            </div>
+            <div id="persona-list" class="space-y-2">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl mono-border text-xs space-y-1.5 opacity-80" style="background-color: var(--bg);">
+            <div class="font-mono font-bold">PRO TIP FOR ELA:</div>
+            <p>Ask any character to explain how they connect to the book's themes—or paste your teacher's homework question right into the chat.</p>
+          </div>
+        </div>
+
+        <!-- Right Panel: Active Chat Window -->
+        <div class="lg:col-span-8 rounded-2xl mono-border flex flex-col overflow-hidden" style="background-color: var(--bg);">
+          <!-- Chat Header -->
+          <div class="p-4 sm:px-6 flex items-center justify-between gap-3" style="border-bottom: 1px solid var(--border);">
+            <div class="flex items-center gap-3">
+              <div id="active-avatar" class="w-10 h-10 rounded-xl btn-inverted flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                JG
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 id="active-name" class="font-bold text-sm sm:text-base">John Green</h3>
+                  <span id="active-tag" class="font-mono text-[10px] px-2 py-0.5 rounded-full mono-border">Author & Narrator</span>
+                </div>
+                <p id="active-bio" class="text-xs opacity-65 line-clamp-1">Rates humanity on a 5-star scale while battling cynicism and OCD.</p>
+              </div>
+            </div>
+            <button onclick="clearChat()" class="px-3 py-1.5 rounded-lg mono-border text-xs font-mono hover:opacity-75 cursor-pointer shrink-0">
+              Reset
+            </button>
+          </div>
+
+          <!-- Messages Feed -->
+          <div id="chat-messages" class="flex-1 p-4 sm:p-6 space-y-4 overflow-y-auto max-h-[46vh] sm:max-h-[50vh]">
+            <!-- Messages inserted here -->
+          </div>
+
+          <!-- Quick ELA Starter Chips -->
+          <div class="px-4 sm:px-6 py-2.5 flex items-center gap-2 overflow-x-auto" style="border-top: 1px solid var(--border); background-color: var(--surface);">
+            <span class="font-mono text-[10px] uppercase opacity-60 shrink-0">Quick Ask:</span>
+            <div id="quick-prompts" class="flex items-center gap-2">
+              <!-- Populated dynamically per character -->
+            </div>
+          </div>
+
+          <!-- Chat Input Form -->
+          <form onsubmit="handleChatSubmit(event)" class="p-3 sm:p-4 flex items-center gap-2" style="border-top: 1px solid var(--border);">
+            <input
+              id="chat-input"
+              type="text"
+              autocomplete="off"
+              placeholder="Ask about themes, quotes, star ratings, or your homework..."
+              class="flex-1 px-4 py-3 rounded-xl mono-border bg-transparent text-sm focus:outline-none"
+            />
+            <button type="submit" id="send-btn" class="btn-inverted px-5 py-3 rounded-xl text-sm font-semibold cursor-pointer shrink-0 flex items-center gap-2">
+              <span>Send</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Minimal Footer -->
+  <footer class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 text-xs opacity-60 flex flex-col sm:flex-row items-center justify-between gap-2" style="border-top: 1px solid var(--border);">
+    <span class="font-mono">THE ANTHROPOCENE REVIEWED // INTERACTIVE STUDY GUIDE</span>
+    <span>Palette: #000000 & #f8f8f8 • Single-File Build</span>
+  </footer>
+
+  <!-- =========================================================
+       APPLICATION DATA & LOGIC
+  ========================================================== -->
+  <script>
+    // ---------------------------------------------------------
+    // 1. CURATED BOOK DATA (ESSAYS, THEMES, CHARACTERS)
+    // ---------------------------------------------------------
+    const ESSAYS = [
+      {
+        title: "Halley's Comet",
+        rating: 4.5,
+        category: "high",
+        tldr: "Visits Earth every 75 years. John saw it as a kid in 1986 and hopes to live to 2061 to see it again.",
+        elaAngle: "Symbolizes cosmic time, human mortality, and the beauty of predicting something bigger than ourselves.",
+        quote: "We are all just passing through, briefly illuminated by the light of a star."
+      },
+      {
+        title: "The Lascaux Cave Paintings",
+        rating: 5.0,
+        category: "high",
+        tldr: "17,000-year-old paintings of animals and handprints in France. Closed to tourists because human breath ruins them.",
+        elaAngle: "Proves humans have always needed to make art and say 'I was here' across thousands of years.",
+        quote: "We have always been desperate to reach across the chasm of time and touch one another."
+      },
+      {
+        title: "Canada Geese",
+        rating: 2.0,
+        category: "low",
+        tldr: "Loud, aggressive birds that poop on suburban lawns and thrive wherever humans reshape the land.",
+        elaAngle: "Mirrors humanity: annoying, territorial, and weirdly successful at adapting to ruined environments.",
+        quote: "They are not majestic, and neither are we—yet here we both are, aggressively surviving."
+      },
+      {
+        title: "Diet Dr Pepper",
+        rating: 4.0,
+        category: "high",
+        tldr: "A weirdly delicious soda engineered to taste sweet with zero calories—a tiny comfort during hard days.",
+        elaAngle: "Shows how the Anthropocene lets us engineer pleasure without consequence, and why small joys matter.",
+        quote: "Sometimes you just want sweetness without the weight of it."
+      },
+      {
+        title: "Monopoly",
+        rating: 2.5,
+        category: "mid",
+        tldr: "Invented by Lizzie Magie to warn against greedy landlords, then stolen and sold to celebrate capitalism.",
+        elaAngle: "Classic irony: a game meant to critique inequality became the ultimate symbol of hoarding wealth.",
+        quote: "We turned a warning about greed into a family game night tradition."
+      },
+      {
+        title: "Auld Lang Syne",
+        rating: 5.0,
+        category: "high",
+        tldr: "The final essay in the book. Explores the New Year's Eve song about remembering old friends and lost time.",
+        elaAngle: "The book's emotional climax—chooses gratitude and shared memory over despair.",
+        quote: "We're here because we're here because we're here."
+      },
+      {
+        title: "The Yips",
+        rating: 2.5,
+        category: "mid",
+        tldr: "When pro athletes suddenly forget how to perform a simple motion because their brain overthinks it.",
+        elaAngle: "A metaphor for anxiety and self-consciousness—how thinking too hard breaks natural flow.",
+        quote: "The mind is a wonderful servant and a terrible master."
+      },
+      {
+        title: "Scratch 'n' Sniff Stickers",
+        rating: 4.5,
+        category: "high",
+        tldr: "1980s childhood stickers whose fake scents inevitably fade away over time.",
+        elaAngle: "Explores how smell triggers intense nostalgia and how all memories slowly lose their sharpness.",
+        quote: "Nothing gold can stay, especially not synthetic grape scent."
+      },
+      {
+        title: "Viral Meningitis",
+        rating: 1.0,
+        category: "low",
+        tldr: "John describes the terrifying pain of brain inflammation and feeling totally helpless in a hospital.",
+        elaAngle: "Strips away human ego: despite all our technology, our bodies remain fragile.",
+        quote: "Pain doesn't make you noble; it just reminds you how small you really are."
+      },
+      {
+        title: "Super Mario Kart",
+        rating: 4.0,
+        category: "high",
+        tldr: "Playing Mario Kart in college, focusing on 'rubber-banding'—where last-place players get better power-ups.",
+        elaAngle: "Contrasts video game fairness with real-world inequality, while celebrating late-night friendship.",
+        quote: "In real life, the people in first place usually just keep getting more Blue Shells to throw backward."
+      },
+      {
+        title: "Teddy Bears",
+        rating: 2.5,
+        category: "mid",
+        tldr: "Named after President Teddy Roosevelt sparing a bear; stuffed animals we project human comfort onto.",
+        elaAngle: "Shows how humans invent gentle versions of nature to comfort themselves from a wild world.",
+        quote: "We take what we fear in the wild and shrink it down until we can hug it to sleep."
+      },
+      {
+        title: "Our Capacity for Wonder",
+        rating: 5.0,
+        category: "high",
+        tldr: "A direct look at choosing awe and paying attention in a world that rewards cynicism.",
+        elaAngle: "The core thesis of the entire book—paying deep attention is an act of love.",
+        quote: "Paying attention to the world is the beginning of falling in love with it."
+      }
+    ];
+
+    const THEMES = [
+      {
+        number: "THEME 01",
+        title: "Hope vs. Cynicism",
+        summary: "Cynicism feels smart because it protects you from disappointment, but John argues that hope—actively paying attention and caring—is braver and necessary.",
+        essays: ["Our Capacity for Wonder", "Auld Lang Syne", "Halley's Comet"],
+        thesis: "In The Anthropocene Reviewed, John Green rejects modern cynicism as a passive defense mechanism, arguing instead that intentional wonder and hope are essential acts of courage in an uncertain world."
+      },
+      {
+        number: "THEME 02",
+        title: "Human Power vs. Human Fragility",
+        summary: "Humans are powerful enough to change Earth's climate (the Anthropocene), yet fragile enough to be wrecked by a microscopic virus or an anxious thought.",
+        essays: ["Viral Meningitis", "Canada Geese", "The Yips"],
+        thesis: "By juxtaposing humanity's geological dominance with personal vulnerability, Green exposes the central paradox of the Anthropocene: we are simultaneously all-powerful and deeply fragile."
+      },
+      {
+        number: "THEME 03",
+        title: "Connection Across Time & Space",
+        summary: "From 17,000-year-old cave handprints to singing 'Auld Lang Syne,' humans constantly leave signals to prove we existed and weren't alone.",
+        essays: ["The Lascaux Cave Paintings", "Auld Lang Syne", "Super Mario Kart"],
+        thesis: "Green demonstrates that art, shared rituals, and storytelling bridge the isolation between individuals across centuries, reminding readers that human survival depends on empathy."
+      },
+      {
+        number: "THEME 04",
+        title: "Finding Profound Meaning in the Mundane",
+        summary: "You don't need a grand philosophy to understand life; a Diet Dr Pepper or a fading Scratch 'n' Sniff sticker holds real emotional truth.",
+        essays: ["Diet Dr Pepper", "Scratch 'n' Sniff Stickers", "Teddy Bears"],
+        thesis: "Through the lens of pop-culture consumer ratings, Green elevates ordinary objects into sacred artifacts of memory, proving that small daily comforts anchor us through grief."
+      }
+    ];
+
+    const CHARACTERS = [
+      {
+        id: "john",
+        initials: "JG",
+        name: "John Green",
+        role: "Author & Narrator",
+        rating: "★★★★½",
+        bio: "Nerdy, empathetic storyteller living in Indianapolis. Battles OCD and anxiety while trying to fall in love with the world.",
+        significance: "Acts as both critic and vulnerable guide—proving that personal honesty makes non-fiction resonate.",
+        prompts: [
+          "Summarize the whole book in 3 bullet points.",
+          "What's your best quote about hope vs. cynicism?",
+          "Why did you use a 5-star rating system?"
+        ],
+        systemPrompt: "You are John Green, author of 'The Anthropocene Reviewed'. Speak in your authentic voice: warm, slightly nerdy, deeply empathetic, thoughtful, honest about living with OCD and anxiety, and fond of footnotes and 5-star ratings. Keep answers concise (2-3 short paragraphs max), engaging for a high school student who dislikes reading, and directly helpful for ELA class."
+      },
+      {
+        id: "lascaux",
+        initials: "17K",
+        name: "Lascaux Cave Artist",
+        role: "Paleolithic Painter (17,000 BCE)",
+        rating: "★★★★★",
+        bio: "An ancient human who crawled into dark French caves with stone lamps to paint bulls and blow pigment over their hand.",
+        significance: "Represents humanity's oldest impulse: making art so future strangers know we were here.",
+        prompts: [
+          "Why did you paint inside a dark cave?",
+          "What do your handprints mean in the book?",
+          "How do you connect to modern teenagers?"
+        ],
+        systemPrompt: "You are one of the Paleolithic artists who painted the Lascaux Cave in France 17,000 years ago, as featured in John Green's 'The Anthropocene Reviewed'. Speak poetically yet clearly to a high school student. Connect your cave paintings and handprints to John Green's themes of human connection across time, mortality, and why art matters. Keep responses concise and easy to use in an ELA discussion."
+      },
+      {
+        id: "comet",
+        initials: "75Y",
+        name: "Halley's Comet",
+        role: "Cosmic Traveler",
+        rating: "★★★★½",
+        bio: "A ball of ice and dust orbiting the sun every 75–76 years, watching generations of humans look up in awe.",
+        significance: "Symbolizes cosmic perspective, time passing, and the beauty of human curiosity.",
+        prompts: [
+          "What did John feel when he saw you in 1986?",
+          "What do you symbolize in the book?",
+          "How do humans change between your visits?"
+        ],
+        systemPrompt: "You are Halley's Comet, featured in John Green's 'The Anthropocene Reviewed' (rated 4.5 stars). Speak with a calm, cosmic, wise perspective. Reference visiting Earth every 75-76 years, John seeing you in 1986 and hoping to survive until 2061, Mark Twain, and themes of time, awe, and human mortality. Keep it concise and helpful for a high school ELA student."
+      },
+      {
+        id: "goose",
+        initials: "CG",
+        name: "The Canada Goose",
+        role: "Suburban Menace & Survivor",
+        rating: "★★☆☆☆",
+        bio: "Loud, fearless, territorial bird that refuses to migrate and thrives in human parking lots and golf courses.",
+        significance: "A mirror of humanity: messy, adaptable, and impossible to ignore in the Anthropocene.",
+        prompts: [
+          "Why did John only give you 2 stars?",
+          "How are humans just like Canada geese?",
+          "What do you represent about nature today?"
+        ],
+        systemPrompt: "You are a Canada Goose from John Green's essay 'Canada Geese' in 'The Anthropocene Reviewed' (rated 2 stars). You are a little sassier and proud of surviving in human-altered suburbs, parking lots, and retention ponds. Explain to a high school student how your species mirrors humanity's adaptability, territorial nature, and awkward coexistence in the Anthropocene. Keep it punchy, funny, and ELA-relevant."
+      },
+      {
+        id: "epoch",
+        initials: "AE",
+        name: "The Anthropocene",
+        role: "The Current Geological Age",
+        rating: "★★★½☆",
+        bio: "The proposed geological epoch defined by humanity's massive impact on Earth's climate, ecosystems, and future.",
+        significance: "The setting and central concept of the entire book—every essay is a review of life inside this era.",
+        prompts: [
+          "What does 'Anthropocene' actually mean?",
+          "Why is this era both amazing and terrifying?",
+          "Give me a thesis statement about the Anthropocene."
+        ],
+        systemPrompt: "You are 'The Anthropocene' itself—the human-centered geological epoch that John Green reviews throughout 'The Anthropocene Reviewed'. Speak with sharp, modern clarity to a teenager who hates reading. Explain how humans have reshaped the entire planet, the paradox of human power vs. fragility, and how John Green finds hope despite it all. Keep responses crisp and helpful for ELA assignments."
+      }
+    ];
+
+    // ---------------------------------------------------------
+    // 2. STATE & NAVIGATION
+    // ---------------------------------------------------------
+    let activeCharacter = CHARACTERS[0];
+    let chatHistories = {};
+    CHARACTERS.forEach(c => {
+      chatHistories[c.id] = [
+        {
+          role: 'model',
+          text: getGreeting(c)
+        }
+      ];
+    });
+
+    function getGreeting(char) {
+      const greetings = {
+        john: "Hey! I'm John. Look—I get it if reading feels like a chore right now. Ask me anything about my essays, why I rated Canada Geese 2 stars, or let's build an essay thesis together.",
+        lascaux: "Greetings across 17,000 years. I pressed my hand against the limestone wall in Lascaux so someone like you would know I existed. What do you want to know about our chapter?",
+        comet: "I pass your planet once every 75 years. John watched me in 1986 and hopes to see me again in 2061. Ask me how cosmic time shapes this book.",
+        goose: "HONK. Yes, John gave me 2 stars. Yes, I own the retention pond behind your school. Ask me why I'm basically a feathered mirror of humanity.",
+        epoch: "I am the Anthropocene—the era where humans became the biggest force shaping Earth. Ask me what this book is really saying about your generation."
+      };
+      return greetings[char.id] || "Ask me anything about The Anthropocene Reviewed!";
+    }
+
+    function switchTab(tabName) {
+      const tabs = ['plot', 'themes', 'cast', 'chat'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tabName) {
+          view.classList.remove('hidden');
+          btn.classList.add('btn-inverted');
+          btn.classList.remove('opacity-75');
+        } else {
+          view.classList.add('hidden');
+          btn.classList.remove('btn-inverted');
+          btn.classList.add('opacity-75');
+        }
+      });
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
+      showToast(isLight ? 'Switched to #f8f8f8 Paper Mode' : 'Switched to #000000 Void Mode');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 2400);
+    }
+
+    function copyText(text) {
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      try {
+        document.execCommand('copy');
+        showToast('Copied to clipboard!');
+      } catch (err) {
+        showToast('Unable to copy automatically');
+      }
+      document.body.removeChild(temp);
+    }
+
+    // ---------------------------------------------------------
+    // 3. RENDER FUNCTIONS (ESSAYS, THEMES, CAST, CHAT)
+    // ---------------------------------------------------------
+    function formatStars(rating) {
+      const full = Math.floor(rating);
+      const half = rating % 1 !== 0;
+      return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - Math.ceil(rating));
+    }
+
+    function renderEssays() {
+      const query = document.getElementById('essay-search').value.toLowerCase().trim();
+      const filter = document.getElementById('essay-filter').value;
+      const grid = document.getElementById('essays-grid');
+
+      const filtered = ESSAYS.filter(e => {
+        const matchesQuery = e.title.toLowerCase().includes(query) ||
+                             e.tldr.toLowerCase().includes(query) ||
+                             e.elaAngle.toLowerCase().includes(query);
+        const matchesFilter = filter === 'all' || e.category === filter;
+        return matchesQuery && matchesFilter;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-8 text-center rounded-2xl mono-border opacity-70 font-mono text-sm">No matching essays found. Try clearing your filter.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(essay => `
+        <article class="mono-card rounded-2xl p-5 flex flex-col justify-between gap-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-xs tracking-wider">${formatStars(essay.rating)}</span>
+              <span class="font-mono text-[11px] px-2 py-0.5 rounded-md mono-border">${essay.rating.toFixed(1)} / 5.0</span>
+            </div>
+            <h4 class="text-lg font-bold tracking-tight">${essay.title}</h4>
+            <p class="text-xs sm:text-sm opacity-80 leading-relaxed">${essay.tldr}</p>
+            <div class="p-3 rounded-xl mono-border text-xs space-y-1" style="background-color: var(--bg);">
+              <span class="font-mono font-bold text-[10px] uppercase opacity-70">What to say in class:</span>
+              <p class="opacity-90">${essay.elaAngle}</p>
+            </div>
+          </div>
+          <div class="pt-2 flex items-center justify-between gap-2" style="border-top: 1px solid var(--border);">
+            <button onclick="copyText('${essay.quote.replace(/'/g, "\\'")} — John Green (${essay.title})')" class="text-xs font-mono underline opacity-80 hover:opacity-100 cursor-pointer">
+              Copy Key Quote
+            </button>
+            <button onclick="askJohnAbout('${essay.title.replace(/'/g, "\\'")}')" class="text-xs font-mono px-2.5 py-1 rounded-lg btn-outline cursor-pointer">
+              Discuss →
+            </button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderThemes() {
+      const grid = document.getElementById('themes-grid');
+      grid.innerHTML = THEMES.map(theme => `
+        <div class="mono-card rounded-2xl p-6 flex flex-col justify-between gap-5">
+          <div class="space-y-3">
+            <span class="font-mono text-xs opacity-65">${theme.number}</span>
+            <h3 class="text-xl font-bold tracking-tight">${theme.title}</h3>
+            <p class="text-sm opacity-80 leading-relaxed">${theme.summary}</p>
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              ${theme.essays.map(e => `<span class="font-mono text-[11px] px-2.5 py-1 rounded-lg mono-border">${e}</span>`).join('')}
+            </div>
+          </div>
+          <div class="p-4 rounded-xl mono-border space-y-3" style="background-color: var(--bg);">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[10px] uppercase opacity-70">Ready-to-Use Thesis Statement</span>
+              <button onclick="copyText('${theme.thesis.replace(/'/g, "\\'")}')" class="btn-inverted px-3 py-1 rounded-lg text-xs font-mono cursor-pointer">
+                Copy Thesis
+              </button>
+            </div>
+            <p class="text-xs sm:text-sm italic opacity-90">"${theme.thesis}"</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCast() {
+      const grid = document.getElementById('cast-grid');
+      grid.innerHTML = CHARACTERS.map(char => `
+        <div class="mono-card rounded-2xl p-6 flex flex-col justify-between gap-5">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="w-11 h-11 rounded-xl btn-inverted flex items-center justify-center font-mono font-bold text-sm">
+                ${char.initials}
+              </div>
+              <span class="font-mono text-xs px-2.5 py-1 rounded-full mono-border">${char.rating}</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold">${char.name}</h3>
+              <p class="font-mono text-xs opacity-65">${char.role}</p>
+            </div>
+            <p class="text-xs sm:text-sm opacity-80 leading-relaxed">${char.bio}</p>
+            <div class="p-3 rounded-xl mono-border text-xs" style="background-color: var(--bg);">
+              <span class="font-mono font-bold text-[10px] uppercase opacity-70 block mb-1">ELA Significance:</span>
+              <p class="opacity-90">${char.significance}</p>
+            </div>
+          </div>
+          <button onclick="startChatWith('${char.id}')" class="w-full btn-inverted py-3 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer">
+            Chat with ${char.name} →
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderPersonaSidebar() {
+      const list = document.getElementById('persona-list');
+      list.innerHTML = CHARACTERS.map(char => {
+        const isActive = char.id === activeCharacter.id;
+        return `
+          <button onclick="selectCharacter('${char.id}')" class="w-full text-left p-3 rounded-xl flex items-center gap-3 transition cursor-pointer ${isActive ? 'btn-inverted' : 'mono-border hover:opacity-90'}">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center font-mono font-bold text-xs shrink-0" style="border: 1px solid currentColor;">
+              ${char.initials}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="font-semibold text-xs sm:text-sm truncate">${char.name}</div>
+              <div class="font-mono text-[10px] opacity-75 truncate">${char.role}</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderChatWindow() {
+      document.getElementById('active-avatar').innerText = activeCharacter.initials;
+      document.getElementById('active-name').innerText = activeCharacter.name;
+      document.getElementById('active-tag').innerText = activeCharacter.role;
+      document.getElementById('active-bio').innerText = activeCharacter.bio;
+
+      // Render starter chips
+      const promptsEl = document.getElementById('quick-prompts');
+      promptsEl.innerHTML = activeCharacter.prompts.map(p => `
+        <button onclick="sendQuickPrompt('${p.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg mono-border text-xs whitespace-nowrap hover:opacity-75 transition cursor-pointer">
+          ${p}
+        </button>
+      `).join('');
+
+      // Render messages
+      const feed = document.getElementById('chat-messages');
+      const history = chatHistories[activeCharacter.id];
+      feed.innerHTML = history.map(msg => {
+        const isUser = msg.role === 'user';
+        return `
+          <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${isUser ? 'btn-inverted' : 'mono-surface mono-border'}">
+              ${!isUser ? `<div class="font-mono text-[10px] uppercase opacity-60 mb-1">${activeCharacter.name}</div>` : ''}
+              <div class="whitespace-pre-line">${escapeHtml(msg.text)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function selectCharacter(id) {
+      activeCharacter = CHARACTERS.find(c => c.id === id) || CHARACTERS[0];
+      renderPersonaSidebar();
+      renderChatWindow();
+    }
+
+    function startChatWith(id) {
+      selectCharacter(id);
+      switchTab('chat');
+    }
+
+    function askJohnAbout(essayTitle) {
+      selectCharacter('john');
+      switchTab('chat');
+      sendQuickPrompt(`Explain the essay "${essayTitle}" and what my ELA teacher wants me to notice about it.`);
+    }
+
+    function clearChat() {
+      chatHistories[activeCharacter.id] = [
+        { role: 'model', text: getGreeting(activeCharacter) }
+      ];
+      renderChatWindow();
+      showToast('Conversation reset');
+    }
+
+    // ---------------------------------------------------------
+    // 4. GEMINI API INTEGRATION (WITH EXPONENTIAL BACKOFF)
+    // ---------------------------------------------------------
+    async function callGeminiWithBackoff(payload) {
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+      const delays = [1000, 2000, 4000];
+
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) return text;
+          throw new Error('Empty response');
+        } catch (err) {
+          if (attempt === delays.length) {
+            throw err;
+          }
+          await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+        }
+      }
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      await sendQuickPrompt(text);
+    }
+
+    async function sendQuickPrompt(userText) {
+      const charId = activeCharacter.id;
+      const history = chatHistories[charId];
+      history.push({ role: 'user', text: userText });
+      renderChatWindow();
+
+      // Add typing indicator
+      const feed = document.getElementById('chat-messages');
+      const typingDiv = document.createElement('div');
+      typingDiv.id = 'typing-indicator';
+      typingDiv.className = 'flex justify-start';
+      typingDiv.innerHTML = `
+        <div class="rounded-2xl px-4 py-3 mono-surface mono-border flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-current dot-1"></span>
+          <span class="w-2 h-2 rounded-full bg-current dot-2"></span>
+          <span class="w-2 h-2 rounded-full bg-current dot-3"></span>
+        </div>
+      `;
+      feed.appendChild(typingDiv);
+      feed.scrollTop = feed.scrollHeight;
+
+      const sendBtn = document.getElementById('send-btn');
+      sendBtn.disabled = true;
+
+      try {
+        // Build conversation contents for Gemini
+        const contents = history.slice(-8).map(m => ({
+          role: m.role === 'user' ? 'user' : 'model',
+          parts: [{ text: m.text }]
+        }));
+
+        const payload = {
+          contents,
+          systemInstruction: {
+            parts: [{ text: activeCharacter.systemPrompt }]
+          }
+        };
+
+        const reply = await callGeminiWithBackoff(payload);
+        history.push({ role: 'model', text: reply });
+      } catch (err) {
+        // Resilient fallback if offline
+        history.push({
+          role: 'model',
+          text: `Here's the key ELA takeaway from my perspective: In The Anthropocene Reviewed, everything comes back to paying attention to our flawed, fascinating human world and choosing hope over cynicism. (Tip: Check your connection if live AI replies are paused.)`
+        });
+      } finally {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) indicator.remove();
+        sendBtn.disabled = false;
+        if (activeCharacter.id === charId) {
+          renderChatWindow();
+        }
+      }
+    }
+
+    // Mini Review Generator in Themes Tab
+    async function generateMiniReview() {
+      const topicInput = document.getElementById('custom-topic');
+      const topic = topicInput.value.trim() || "AirPods on the Walk to First Period";
+      const stars = document.getElementById('custom-stars').value;
+      const btn = document.getElementById('mini-review-btn');
+      const outputBox = document.getElementById('mini-review-output');
+      const outputTitle = document.getElementById('mini-review-title');
+      const outputText = document.getElementById('mini-review-text');
+
+      btn.disabled = true;
+      btn.innerText = "Writing...";
+      outputBox.classList.remove('hidden');
+      outputTitle.innerText = `REVIEWING: ${topic.toUpperCase()} (${stars} STARS)`;
+      outputText.innerText = "Drafting an Anthropocene-style reflection...";
+
+      try {
+        const payload = {
+          contents: [{
+            parts: [{
+              text: `Write a short 1-paragraph review of "${topic}" ending with "I give ${topic} ${stars} out of 5 stars." Style it like John Green's book 'The Anthropocene Reviewed'—blend one interesting cultural/historical observation with a relatable teenage reflection on human connection or hope.`
+            }]
+          }]
+        };
+        const result = await callGeminiWithBackoff(payload);
+        outputText.innerText = result;
+      } catch (err) {
+        outputText.innerText = `In the Anthropocene, we surround ourselves with small inventions like ${topic} to make daily life feel a little less overwhelming. Like everything humans build, it is imperfect and temporary—yet in the quiet moments when it works, it reminds us that we are trying to take care of ourselves and each other. I give ${topic} ${stars} out of 5 stars.`;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Generate Draft";
+      }
+    }
+
+    // Initialize App on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderEssays();
+      renderThemes();
+      renderCast();
+      renderPersonaSidebar();
+      renderChatWindow();
+    });
+  </script>
+</body>
+</html>
